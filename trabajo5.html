@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabajo</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            background-color: gray;
+            display: flex;
+            justify-content: center; 
+            align-items: center;     
+        }
+        fieldset{
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+        }
+    </style>
 </head>
 <body>
     <div id="main">
@@ -12,17 +27,14 @@
         </h3>
 
         <button @click="contador++">
-            Click me: {{contador}}
+            Pulsame: {{contador}}
         </button>
         <form>
             <fieldset>
-                <label>
-                    Nombre:
-                </label>
-                <input type="" v-model="username" placeholder="escribe aqui" name="">
+                <input type="" v-model="username" placeholder="Nombre" name="">
             </fieldset>
             <label>
-                tu nombre es <span id="span_name"> {{username}} </span>
+                Tu nombre es <span id="span_name"> {{username}} </span>
             </label>
         </form>
 
@@ -46,7 +58,6 @@
         </form>
 
     </div>
-
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <script>
@@ -54,8 +65,7 @@
     
         createApp({
             setup() {
-
-                const name_app = ref('Mi primer app!')
+                const name_app = ref('CanelOS!')
                 let contador = ref(0)
                 let username = ref('')
                 let resultado = ref(0)
@@ -70,7 +80,6 @@
                     num1,
                     num2
                 }
-
             }
         }).mount('#main')
     </script>
