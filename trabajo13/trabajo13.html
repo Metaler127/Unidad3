@@ -100,7 +100,6 @@
 </head>
 <body>
     <div id="main">
-        
         <div v-if="!isLogin">
             <h1>Bienvenido!</h1>    
             <form @submit.prevent="login">
@@ -151,15 +150,23 @@
                 const isLogin = ref(false);
                 const users = ref([]);
 
-                const login = () => {
+                return {
+                    email,
+                    password,
+                    isLogin,
+                    users,
+                };
+            },
+            methods: {
+                login() {
                     let userFound = false;
                     fetch("users.json")
                         .then(response => response.json())
                         .then(response => {
                             response.forEach(user => {
-                                if (user.email === email.value && user.password === password.value) {
-                                    isLogin.value = true;
-                                    users.value = response;
+                                if (user.email === this.email && user.password === this.password) {
+                                    this.isLogin = true;
+                                    this.users = response;
                                     userFound = true;
                                 }
                             });
@@ -167,21 +174,11 @@
                                 alert("Usuario o contraseña incorrectos");
                             }
                         });
-                };
-
-                const eliminar = (index) => {
-                    users.value.splice(index, 1);
-                };
-
-                return {
-                    email,
-                    password,
-                    isLogin,
-                    users,
-                    login,
-                    eliminar,
-                };
-            },
+                },
+                eliminar(index) {
+                    this.users.splice(index, 1);
+                }
+            }
         }).mount('#main');
     </script>
 </body>
