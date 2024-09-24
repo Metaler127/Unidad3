@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo</title>
+    <style>
+        body {
+            background-color: #f3f4f6; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        #main {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 40rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #374151;
+        }
+
+        fieldset {
+            margin-bottom: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+            border-color: #3b82f6;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            margin-top: 2rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            color: #374151;
+        }
+
+        th {
+            background-color:#70a2ee;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+        }
+
+        td {
+            background-color: #9dd2f1;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        tr:hover td {
+            background-color:#5bb9f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        
+        <div v-if="!isLogin">
+            <h1>Bienvenido!</h1>    
+            <form @submit.prevent="login">
+                <fieldset>
+                    <input type="email" v-model="email" placeholder="Email" required>
+                </fieldset>
+                <fieldset>
+                    <input type="password" v-model="password" placeholder="Contraseña" required>
+                </fieldset>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+        
+        <div v-if="isLogin">
+            <h1>Bienvenido, {{ email }}</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Contacto</th>
+                        <th>Compañía</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(user, index) in users" :key="user.email">
+                        <td>{{ user.name }}, {{user.username}}</td>
+                        <td>{{ user.email }}, {{user.phone}}</td>
+                        <td>{{ user.company.name }}, {{user.company.bs}}</td>
+                        <td>
+                            <button v-on:click="eliminar(index)">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script>
+        const { createApp, ref } = Vue
+
+        createApp({
+            setup() {
+                const email = ref('');
+                const password = ref('');
+                const isLogin = ref(false);
+                const users = ref([]);
+
+                const login = () => {
+                    let userFound = false;
+                    fetch("users.json")
+                        .then(response => response.json())
+                        .then(response => {
+                            response.forEach(user => {
+                                if (user.email === email.value && user.password === password.value) {
+                                    isLogin.value = true;
+                                    users.value = response;
+                                    userFound = true;
+                                }
+                            });
+                            if (!userFound) {
+                                alert("Usuario o contraseña incorrectos");
+                            }
+                        });
+                };
+
+                const eliminar = (index) => {
+                    users.value.splice(index, 1);
+                };
+
+                return {
+                    email,
+                    password,
+                    isLogin,
+                    users,
+                    login,
+                    eliminar,
+                };
+            },
+        }).mount('#main');
+    </script>
+</body>
+</html>
