@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <form @submit.prevent="submitForm" v-if="!isLoggedIn">
+            <fieldset>
+                <legend>Login</legend>
+                <label for="email">Email:</label>
+                <input type="email" id="email" v-model="email" required>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" v-model="password" required>
+                
+                <button type="submit">Login</button>
+            </fieldset>
+        </form>
+        <p v-else>Estás logueado. Redirigiendo...</p>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    email: '',
+                    password: '',
+                    isLoggedIn: false,
+                    standardUser: {
+                        email: 'prueba@gmail.com',
+                        password: '1234'
+                    }
+                }
+            },
+            methods: {
+                submitForm() {
+                    if (this.email === this.standardUser.email && this.password === this.standardUser.password) {
+                        localStorage.setItem('loggedIn', true);
+                        this.redirectToMovies();
+                    } else {
+                        alert('Credenciales incorrectas');
+                    }
+                },
+                redirectToMovies() {
+                    window.location.href = 'movies.html';
+                },
+                checkLoginStatus() {
+                    const loggedIn = localStorage.getItem('loggedIn');
+                    if (loggedIn) {
+                        this.isLoggedIn = true;
+                        this.redirectToMovies();
+                    }
+                }
+            },
+            mounted() {
+                this.checkLoginStatus();
+            }
+        }); 
+        app.mount('#app');
+    </script>
+</body>
+</html>

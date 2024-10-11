@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: rgb(31, 84, 131);
+            color: #fff;
+        }
+
+        #movieDetails {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgb(68, 148, 219);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px #444b6e8a;
+        }
+
+        .movie-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        img {
+            width: 350px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .movie-info {
+            flex: 1;
+        }
+
+        .back-button, .save-button, .delete-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #444b6e;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        .back-button:hover, .save-button:hover, .delete-button:hover {
+            background-color: #3a425d;
+        }
+
+        .rating {
+            margin-top: 20px;
+        }
+
+        .rating label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .rating select {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="movieDetails">
+        <button class="back-button" @click="goBack">Regresar</button>
+
+        <div class="movie-content">
+            <img :src="'https://www.themoviedb.org/t/p/w600_and_h900_bestv2/' + movie.poster_path" alt="movie poster">
+            <div class="movie-info">
+                <h1>{{ movie.title }}</h1>
+                <p>
+                    {{ movie.tagline }}
+                </p>
+                <p>
+                    <strong>Lanzamiento:</strong> 
+                    <br>
+                    {{ movie.release_date }}
+                </p>
+                <p class="genres">
+                    <strong>Géneros:</strong>
+                    <br>
+                    <span v-for="(genre, index) in movie.genres" :key="genre.id">
+                        {{ genre.name }}<span v-if="index < movie.genres.length - 1">, </span>
+                    </span>
+                </p>
+                <p>
+                    <strong>Sinopsis:</strong>
+                    <br>
+                    {{ movie.overview }}
+                </p>
+                <p>
+                    <strong>Lenguaje original:</strong> 
+                    {{ movie.original_language }}
+                </p>
+                <p>
+                    <strong>Popularidad:</strong> 
+                    {{ movie.popularity }}
+                </p>
+                <p>
+                    <strong>Votos:</strong> 
+                    {{ movie.vote_count }}
+                </p>
+                <p>
+                    <strong>Calificación:</strong> 
+                    {{ movie.vote_average }} / 10
+                </p>
+
+                <div class="rating">
+                    <label for="rating">Tu calificación:</label>
+                    <select v-model="userRating" id="rating">
+                        <option disabled value="">Selecciona un rating</option>
+                        <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button class="save-button" @click="saveRating">Guardar calificación</button>
+                    <button class="delete-button" @click="deleteRating">Eliminar calificación</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    movie: {},
+                    userRating: ''
+                };
+            },
+            methods: {
+                fetchMovieDetails() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const movieId = urlParams.get('id');
+
+                    fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=13c164db7b0cbbc91a51acf2fcc65f79`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.movie = data;
+                            document.title = this.movie.title;
+                            console.log(this.movie);
+                            this.loadRating(movieId);
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener los detalles de la película: " + error);
+                        });
+                },
+                goBack() {
+                    window.history.back();
+                },
+                saveRating() {
+                    if (this.userRating) {
+                        const movieId = this.movie.id;
+                        localStorage.setItem(`rating_${movieId}`, this.userRating);
+                        alert(`Gracias por calificar con ${this.userRating} estrellas.`);
+                    } else {
+                        alert('Por favor selecciona un rating antes de guardar.');
+                    }
+                },
+                loadRating(movieId) {
+                    const savedRating = localStorage.getItem(`rating_${movieId}`);
+                    if (savedRating) {
+                        this.userRating = savedRating;
+                    }
+                },
+                deleteRating() {
+                    const movieId = this.movie.id;
+                    localStorage.removeItem(`rating_${movieId}`);
+                    this.userRating = '';
+                    alert('Tu calificación ha sido eliminada.');
+                }
+            },
+            mounted() {
+                this.fetchMovieDetails();
+            }
+        }).mount('#movieDetails');
+    </script>
+</body>
+</html>
